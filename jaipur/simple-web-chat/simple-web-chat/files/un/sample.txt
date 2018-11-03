@@ -1,0 +1,12 @@
+In profile files data is stored in json format as describrd below:
+
+1) Key "prf" contains json of name, email and password.
+2) Key "con" contains usernames of contacts.
+3) Key "conr" contains usernames of contacts whose request is still pending.
+4) Key "grp" contains names of all groups of user.
+5) Key "grpr" contains names of all groups whose request is still pending.
+6) Key "lst" contains last seen date time value.
+
+Refer dev.u for sample content.
+
+Note: Instead of username userid can also be used if it fits your need.

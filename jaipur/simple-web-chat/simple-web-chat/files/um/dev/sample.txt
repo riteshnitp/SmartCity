@@ -1,0 +1,4 @@
+Files here can be used to store data of a user related any particular group
+For e.g. data of user dev related to group named "g1" with group id "52a46a6d270de" can be stored inside folder 'files/um/dev/g~g1-52a46a6d270de/'.
+
+Folders here are checked in tmp/ for messages related to same group or contact relation.

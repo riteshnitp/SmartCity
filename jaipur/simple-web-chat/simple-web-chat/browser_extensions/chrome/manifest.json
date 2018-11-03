@@ -1,0 +1,15 @@
+{
+	"manifest_version": 2,
+	"name": "ALPHA - &CHAT",
+	"description": "Local chat, alpha version",
+	"version": "0.1",
+	"permissions": [
+		"http://192.168.30.44/"
+	],
+	"browser_action": {
+		"default_title": "ALPHA - CHAT",
+		"default_icon": "chat-icon.png",
+		"default_popup": "chat.html"
+	}/*,
+	"web_accessible_resources": ["cext.js"]*/
+}

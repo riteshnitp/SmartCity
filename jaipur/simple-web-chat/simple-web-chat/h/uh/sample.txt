@@ -1,0 +1,2 @@
+here chat history files between two users will be stored in folder as: 
+'user1-user2/2014-04' (for current and last months)

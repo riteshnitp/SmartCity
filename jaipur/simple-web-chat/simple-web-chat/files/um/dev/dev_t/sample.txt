@@ -1,0 +1,2 @@
+this dir can be used to store data related to relation between two users 
+For e.g. this dir can be used to store data related to users with username dev and t.

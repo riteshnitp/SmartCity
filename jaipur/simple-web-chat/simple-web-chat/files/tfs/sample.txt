@@ -1,0 +1,1 @@
+Here a folder of username is created and inside it, a file created for each file shared (with name filename_-_contactname.s) with contact during chat and used for permissions checks.

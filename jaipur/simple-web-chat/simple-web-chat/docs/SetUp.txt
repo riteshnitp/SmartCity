@@ -1,0 +1,193 @@
+
+1) Unzip downloaded file in to a web server.
+
+
+
+2) Set folder and file permissions.
+
+Below are commands for lunux users, windows users can use gui.
+
+set owner (instead of ubuntu write you system user)
+sudo chown -Rf ubuntu:www-data ./simple-web-chat/
+
+set permission: full for owner read and execute for group (www-data) and no permission for public users
+sudo chmod -Rf 750 ./simple-web-chat/
+
+set permission as full access for owner, readonly for group and no access for public users
+sudo chmod -Rf 740 ./simple-web-chat/.htaccess
+
+
+For /h/ folder, a place where history files are placed
+
+set permission as full access for owner and group but no access for public users
+sudo chmod -Rf 770 ./simple-web-chat/h/
+
+set permission as full access for owner, readonly for group and no access for public users
+sudo chmod -Rf 740 ./simple-web-chat/h/.htaccess
+
+
+For /files/ folder, a place where various data files are placed 
+
+set permission as full access for owner and group but no access for public users
+sudo chmod -Rf 770 ./simple-web-chat/files/
+
+set permission as full access for owner, readonly for group and no access for public users
+sudo chmod -Rf 740 ./simple-web-chat/files/.htaccess
+
+
+For /pub/ folder, a place where uploaded files are placed
+
+set permission as full access for owner and group but no access for public users
+sudo chmod -Rf 770 ./simple-web-chat/pub/
+
+set permission as full access for owner, readonly for group and no access for public users
+sudo chmod -Rf 740 ./simple-web-chat/pub/.htaccess
+
+
+For /tmp/ folder, a place where temperory data is stored
+
+set permission as full access for owner and group but no access for public users
+sudo chmod -Rf 770 ./simple-web-chat/tmp/
+
+set permission as full access for owner, readonly for group and no access for public users
+sudo chmod -Rf 740 ./simple-web-chat/tmp/.htaccess
+
+
+
+3) Set Your SMTP details in '/classes/class.Mail.php' file inside 'sendMail' function. 
+
+If you dont set SMTP details, user will be registered but as inactive user and verification email won't be received by the user. Also an email for forgot password will not work.  
+Still, 
+a) if you don't want to verify email address and want to allow any user to register directly without email verification 
+and 
+b) also ok with email not going for reset (change) password but instead can manually change and send email to user (for this You need to understand point 4 mentioned below)
+then
+Follow instructions as below :-
+
+i)
+For Verification Email:
+
+Open '/classes/class.CheckUserIdentity.php' file and go to 'sendVerificationMail()' function. 
+The code in this function must be commented to match the below code:
+
+function sendVerificationMail($name, $email, $udtls) {
+	global $site_path, $site_url;
+	// mail($email, 'Email Verification', $site_path.'uverify.php?code='.$udtls['pref']['vcode'], $headers);
+	/* 
+	include_once($site_path.'classes'.DIRECTORY_SEPARATOR.'class.Mail.php');
+	$mailer_obj = new Mail();
+	$mbody = '<a href="'.$site_url.'uverify.php?name='.$name.'&code='.$udtls['prf']['vcode'].'">'.$site_url.'uverify.php?name='.$name.'&code='.$udtls['prf']['vcode'].'</a>';
+	$rtrn_val = $mailer_obj->sendMail($email, $mbody);
+	if($rtrn_val) {
+		$return_val = 'wait';
+	} else {
+		@ unlink($fl);
+		$return_val = 'e-error';
+	}
+	*/
+	$return_val = 'success:'.$name;
+	return $return_val;
+}
+// Notice the comments ( /* ... */ ) applied and comment ( // ) removed from the code.
+
+ii)
+For Forgot (Change) Password:
+
+Similarly open '/classes/class.ModifyPass.php' file and go to 'sendResetPasswordEmail()' function.
+The code in this function must be commented to match the below code:
+
+function sendResetPasswordEmail($name, $email, $udtls) 
+{
+	global $site_path, $site_url;
+	$return_val = 'error';
+	/*
+	include_once($site_path.'classes'.DIRECTORY_SEPARATOR.'class.Mail.php');
+	$mailer_obj = new Mail();
+	$mbody = '<a href="'.$site_url.'sc.php?name='.$name.'&cpcode='.$udtls['prf']['cpcode'].'">'.$site_url.'sc.php?name='.$name.'&cpcode='.$udtls['prf']['cpcode'].'</a>';
+	$rtrn_val = $mailer_obj->sendMail($email, $mbody);
+	if($rtrn_val) {
+		$return_val = 'wait';
+	} else {
+		$return_val = 'e-error';
+	}
+	*/
+	$return_val = 'wait';
+	return $return_val;
+}
+// Notice the comments ( /* ... */ ) applied and comment ( // ) removed from the code.
+
+
+
+4) Manually change user's password or activate new account:
+Each user will have a file with name of their username inside '/files/un/' folder.
+This file contains user details in a json format.
+Here You can manually set value of password at paswd fields like "paswd":"newpassword" 
+Also remove "cpcode" or "vcode" (in case of new account) if found in that json along with its value i.e. remove whole "cpcode":"somevalue" key value pair.
+Finally You can send email of new password to user from your email service provider manually.
+Note: for simplicity we have not used encryption but you should and fot this refer 'encPass()' function call in '/classes/class.CheckUserIdentity.php' file.
+
+
+
+5) Cron:
+This chat application will by default work without any database but You can also integrate with Your choice of database.
+You must be a PHP developer or need a help from any PHP developer to do this
+a) Open '/crons/loadmessages.php' file.
+b) Understand the code in this file and read commented text well to understand what needs to be done.
+c) Also make sure to set $manage_tmp_files = false; in 'common.php' file else there won't be any file left to for cron to work on
+d) In this code $msg contains all messages. Its a 2 dimention array with first key $path containing usernames of sender and receiver.
+e) $msgids is an array containing all unique id of files read alongwith file path
+f) $msg is a multi-dimentional array containing array value of unique message id, sender username, receiver username and message under the path key. 
+g) Inside condition if($pmcount > 0 && $pmcount % 1000 == 0) {, there will be comment like "// your code to insert into your database", 
+where you can write your code to insert messages in bulk of 1000 (due to the condition). 
+
+h) It is recommended that you call a finction at this place and the same function you will have to call at under thi condition below 
+if(count($msg) > 0) {
+
+i) $genfiles is an array of files containning broadcasted (public / general tab) messages.   
+
+j) Once data is inserted, make sure files that are read and whose messages are inserted, those files must be deleted so that they are not inserted again.
+You can write that code under section after comment "// del tmp files".
+
+
+
+6) Group Chat (Chat Rooms)
+This chat application supports group chat feature which You can use as chat rooms.
+Groups are maintained as mentioned below:
+
+a) There will be a file inside '/files/grp/' folder with name of group followed by some unique id
+
+b) This file contains data in json format. In this file You if there is data like this: 
+{"con":["u1","u2","u3"],"conr":[]}; 
+It means group have contains users with username 'u1', 'u2', and 'u3' as its members.
+
+c) "conr":"..." will contain some usernames silimar to "con" if some user is added in the group but that user has not yet accepted the invitation. Once accepted that username will be atted to "con" and removed from "conr" by the system.
+d) Also, for each member there will be a file inside '/files/un/' folder with their username as filename. In this file user details are stored.
+
+e) This file also contains data in json format. In this file if there is data like this :
+{"prf":{"name":"u1","email":"u1@emails.com","paswd":"abc123"},"con":["u2","t1"],"lst":"2015-02-13 03:40:05 PM","grp":{"pqr123":"g1"},"conr":[]};
+It means that user user u1 have user with usernames 'u2', and 't2' in contacts and this user is a member of group 'g1' with unique id 'pqr123'. Here pqr 123 is unique id of group g1 (check 1st point) and not of user.
+
+f) Similarly files for user 'u2' and 'u3' will also have entry of this g1 group inside their user details file. 
+g) Apart from this inside '/files/um/' there must be a folder with username of each user. 
+
+h) Inside this folder there must be one folder for each of the contacts of this user appended or prepended with username of first user.
+For. e.g. 
+For user u1 there will be a forlder '/files/um/u1' inside which there will be 3 folders 'u2', 't1' and 'g~g1_pqr123' 
+i.e. 3 folders are  
+I) '/files/um/u1/u1-u2/'
+II) '/files/um/u1/t1-u1/' 
+III) '/files/um/u1/g~g1_pqr123/'
+
+i) In this chat applications users can create groups and invite other users to the group. We dont provide any admin interface to create and manage Chat Rooms. 
+
+j) So, if you need this You can either
+I) manage it by providing such an interface inside You website or some application other than this
+II) extent this chat application on your own to have required admin interface
+III) manage it manually (though this option is not advisable for those who have huge userbase and want to administer group chat or chat rooms).
+
+
+
+7) Websockets
+This chat application also comes with a websocker server.
+If want to use Websockets, you can start webserver for websocket and to do that execute the below command in command line:
+/usr/bin/php -q /var/www/simple-web-chat/chat.php

@@ -1,0 +1,1 @@
+Here files with name as email-id of users is created for indexing purpose

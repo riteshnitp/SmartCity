@@ -1,0 +1,122 @@
+
+Structure Of Application:
+
+The main entry point of application is index file.
+
+All the files place on root folder of the project are entry point of a request made from the application.
+
+These files will access the class files placed in 'classes' folder to complete the task.
+
+One class ma have access to function of same or other class.
+
+Moreover, 3rd party libraries used are placed inside 'lib' folder.
+
+Below are the details about all fodlers of the project:
+
+	audio: Contains audio files used in application for sound of new message. 
+
+	classes: Contains class files used in the application.
+
+	crons: Contains cron file which you can modify as per your need and use to sync messages to any database system. 
+
+	css: Contains css stylesheet files.
+
+	files: Contains user related persistent information.
+
+	h: Contains file with history of user messages.
+
+	images: Contains image files used in the application.
+
+	js: Contains javascript files used in the application.
+
+	lib: Contains external (3rd party) libraries used in the application.
+
+	pub: Contains files uploaded by the user.
+
+	server: Contains files used to websocket support.
+
+	tmp: Temporarily stored messages received from the user
+
+
+
+Now lets have a detailed view for each file / folder.
+
+Root folder:
+
+	common: File containing common code which is included inside all other files for each request. 
+		In this file first of all time zone is set using date_default_timezone_set() function.
+		In the next few lines site path and site url are determined .
+		After that an arrays is created to define text code for smileys.
+		Now, few global variables are defined which we have used through out the application.
+			debug_mode: Not used yet
+			manage_tmp_files: If true user messages will be deleted from 'tmp' folder by the application, if false application won't but you will have to delete it using the cron
+			port: If websocket server is started it will run on this port
+			long_polling_inerval: Minimum interval for which request to server for new message will wait for server's response after which it will disconnect and make new request
+			group_prefix: Prefix prepended to the group files to identify them as group files and not to consider as user files.
+			name_sep: Separator used to separate names of two users when used together for association of those two users inside the application.
+			group_sep Seperator used to separate group name and group unique number
+		Finally, class 'FSDS' is included and its object is created. This is used throughout the application to deal with data storage. 
+
+	index: Main entry file of the application
+		You can see that common file is included in the index file. The same way it is also included in every file which serve as entry point to any request.
+		Next, two variables are set from get requests if available. These are 'name' (name of user) and 'cpcode' (change password code, used in forgot password flow).
+		Next, we have assigned few variable from post request and also assigned ejc (extra javascript code) variable to call login in case these variables are assigned. 
+		This is to facilitate you to integrate with your application and make your application users login into this chat application using a post method redirect (* user files must exist, more detail later on).
+		Next, we have defined a variable containing html code to load default smileys. Make sure this code is proper as per smileys variable in common file.
+		Next, we are scanning 'images/custom/' folder to check for any other smileys available. Uncomment the line inside foreach loop starting with code '// $anims' and also the line outside foreach loop starting with code '// $emos' to enable loading of these smileys.
+
+	chat: This file can be used to run websocket server.
+		Command to execute this file is: path_to_php_executable -q /path_to_this_file/chat.php
+		For e.g. /usr/bin/php -q /var/www/simple-web-chat/chat.php
+		You can see the here also 'common' file is loaded first and then the required class files are loaded.
+		Finally, server object is created and run method of the server object is executed which will start the websocket server.
+
+	download: This file is the entry point to download user's uploaded files. It is not using any class file and itself contains logic to provide download to user's uploaded files. 
+		Whenever a file is uploaded one empty flag file is created at 'files/tfs/' folder under a folder with username of uploading user. 
+		The name of this file is appended with username of contact with which this file is shared. In case of group its group's identifier instead of username of contact.
+		Also, the link stored in message contains username of uploader.  
+		Hence, in this file we fetch uploader's username from 'fl' variable obtained from request.
+		The 'name' variable is the username of the user from which request to download is received.
+		So, if the 'name' variable is the same as that obtained from 'fl' variable of request or if a flag file exists for the user who requested to download; means the user can access / download the file.
+
+	acceptcreq: This file is the entry point for add as contact request. It uses acceptCReq() function of 'AcceptRequest' class. 
+
+	acceptgreq: This file is the entry point for add to group request. It uses acceptGReq() function of 'AcceptRequest' class. 
+	
+	biCChat: This file is the entry point for request to begin chat with any contact. It uses initCChat() function of 'InitContactChat' class. 
+	
+	biGChat: This file is the entry point for request to begin chat with any group. It uses initGChat() function of 'InitGroupChat' class.
+	
+	chkusr: This file is the entry point for request to check user login details. It uses checkIdentity() function of 'CheckUserIdentity' class.
+
+	cp: This file is the entry point to forgot password request. It uses modifyPasscode() function of 'ModifyPass' class.
+
+	csrch: This file is the entry point to contact search request. It uses getUserGroupsNContacts() function of 'UserContacts' class.
+
+	filehandler: This file is the entry point to file upload request. It uses fileCopy() function of 'Reply' class.
+
+	history: This file is the entry point to display user's history of messages. It uses getHistory() function of 'ChatHistory' class.
+
+	logout: This file is the entry point to user logout request. It uses clearSession() function of 'ClearUserSession' class.
+
+	managegroup: This file is the entry point to user's manage group (add / edit group) request. It uses manageUserGroups() function of 'ManageGroups' class.
+
+	nchat: This file is the entry point to fetch user messages. It uses fetchMessages() function of 'Messages' class.
+
+	newcontact: This file is the entry point to add new contact request. It uses addNewContact() function of 'NewContact' class.
+
+	rejectcreq: This file is the entry point to reject contact request. It uses rejectCRequest() function of 'RejectRequest' class.
+
+	rejectgreq: This file is the entry point to reject add to group request. It uses rejectGRequest() function of 'RejectRequest' class.
+
+	rejectgroup: This file is the entry point to exit from a group request. It uses removeGroup() function of 'RemoveContacts' class.
+
+	removecon: This file is the entry point of request to remove a user from contact. It uses removeContact() function of 'RemoveContacts' class.
+
+	reply: This file is the entry point to send a message. It uses sendMessage() function of 'Reply' class.
+
+	selcgroup: This file is the entry point of request to fetch group details. It uses groupContacts() function of 'GroupDetails' class.
+
+	ssrch: This file is the entry point of request to search people. It uses findPeople() function of 'SearchPeople' class.
+
+	uverify: This file is the entry point of request to verify user account. It uses verifyUser() function of 'UserVerification' class.

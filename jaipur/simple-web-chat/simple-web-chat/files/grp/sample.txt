@@ -1,0 +1,6 @@
+File in this folder will contain group details in json format as mentioned below:
+
+1) Key "con" contains usernames of group members
+2) Key "conr" contains usernames of those group members who have not yet accepted request
+
+Check sample group file 'g1-52a46a6d270de.u' to get idea about data stored in group files.

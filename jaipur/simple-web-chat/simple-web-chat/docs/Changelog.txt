@@ -1,0 +1,6 @@
+
+>> 19th April 2016 : 
+
+1) Added few security checks. 
+2) Login maintained on reload against previous sessionless version.
+3) Improved performance, serves 1 lakh messages in avg 30 seconds (tested with apache benchmark utility)
